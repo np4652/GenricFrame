@@ -10,7 +10,7 @@ namespace GenricFrame.AppCode.Migrations
         public override void Down()
         {
             Delete.FromTable("Employees")
-                .Row(new Employee
+                .Row(new
                 {
                     EmployeeId = new Guid("59c0d403-71ce-4ac8-9c2c-b0e54e7c043b"),
                     Age = 34,
@@ -19,7 +19,7 @@ namespace GenricFrame.AppCode.Migrations
                     CompanyId = new Guid("67fbac34-1ee1-4697-b916-1748861dd275")
                 });
             Delete.FromTable("Companies")
-                .Row(new Company
+                .Row(new
                 {
                     CompanyId = new Guid("67fbac34-1ee1-4697-b916-1748861dd275"),
                     Address = "Test Address",

@@ -13,7 +13,7 @@ namespace GenricFrame.AppCode.DAL
     public class DapperRepository : IDapperRepository, IDisposable
     {
         private readonly IConfiguration _config;
-        private string Connectionstring = "DBCon";
+        private readonly string Connectionstring = "SqlConnection";
         public DapperRepository(IConfiguration config)
         {
             _config = config;
