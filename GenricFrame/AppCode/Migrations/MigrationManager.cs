@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace GenricFrame.AppCode.Migrations
 {
@@ -26,6 +27,28 @@ namespace GenricFrame.AppCode.Migrations
                 }
             }
             return host;
+        }
+
+        public static string MigrateDatabase(IServiceProvider ServiceProvider,string DatabaseName)
+        {
+            string result = "Migration not started";
+            try
+            {
+                var databaseService = ServiceProvider.GetRequiredService<Database>();
+                var migrationService = ServiceProvider.GetRequiredService<IMigrationRunner>();
+                databaseService.CreateDatabase(DatabaseName);
+                migrationService.ListMigrations();
+                migrationService.MigrateUp();
+                //migrationService.MigrateDown(202106280001); //To revert specific migraton
+                result = "Migration completed";
+            }
+            catch(Exception ex)
+            {
+                //log errors or ...
+                result = ex.Message;
+                throw;
+            }
+            return result;
         }
     }
 }
