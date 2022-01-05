@@ -1,12 +1,15 @@
 using FluentMigrator.Runner;
 using GenricFrame.AppCode.DAL;
 using GenricFrame.AppCode.Migrations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Text;
 
 namespace GenricFrame
 {
@@ -21,7 +24,7 @@ namespace GenricFrame
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {          
+        {
             services.AddSingleton<DapperRepository>();
             services.AddSingleton<Database>();
             services.AddLogging(c => c.AddFluentMigratorConsole())
@@ -29,7 +32,22 @@ namespace GenricFrame
        .ConfigureRunner(c => c.AddSqlServer2016()
            .WithGlobalConnectionString(Configuration.GetConnectionString("SqlConnection"))
            .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations());
-
+            /* Jwt Token */
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = Configuration["Jwt:Issuer"],
+            ValidAudience = Configuration["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+        };
+    });
+            /* End Jwd */
             services.AddControllersWithViews();
         }
 
@@ -47,6 +65,8 @@ namespace GenricFrame
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            //app.UseAuthentication();
 
             app.UseAuthorization();
 
