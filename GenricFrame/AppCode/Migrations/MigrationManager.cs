@@ -15,7 +15,7 @@ namespace GenricFrame.AppCode.Migrations
                 var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
                 try
                 {
-                    databaseService.CreateDatabase("DapperMigrationExample");
+                    databaseService.CreateDatabase("TestDb");
                     migrationService.ListMigrations();
                     migrationService.MigrateUp();
                     //migrationService.MigrateDown(202106280001); //To revert specific migraton
@@ -34,6 +34,7 @@ namespace GenricFrame.AppCode.Migrations
             string result = "Migration not started";
             try
             {
+                //AppConfig.AppConfigurationJson(DatabaseName);
                 var databaseService = ServiceProvider.GetRequiredService<Database>();
                 var migrationService = ServiceProvider.GetRequiredService<IMigrationRunner>();
                 databaseService.CreateDatabase(DatabaseName);
