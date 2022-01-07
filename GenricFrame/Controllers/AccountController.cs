@@ -20,10 +20,16 @@ namespace GenricFrame.Controllers
         {
             _config = config;
         }
-
+        private List<User> _users = new List<User>
+         {
+             new User { Id = 1, Username = "Amit", Password = "password" }
+         };
         public IActionResult Login()
         {
-            User login = new User();
+            User login = new User
+            {
+                Username = "Jignesh"
+            };
             IActionResult response = Unauthorized();
             var user = AuthenticateUser(login);
 
@@ -56,6 +62,29 @@ namespace GenricFrame.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        private async Task<string> GenerateJSONWebTokenAsync(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var userRoles = new List<string> { "Admin" };//await _userManager.GetRolesAsync(user);
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.EmailAddress),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+              _config["Jwt:Issuer"],
+              authClaims,
+              expires: DateTime.Now.AddMinutes(120),
+              signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         private User AuthenticateUser(User login)
         {
             User user = new User();
@@ -64,9 +93,91 @@ namespace GenricFrame.Controllers
             //Demo Purpose, I have Passed HardCoded User Information    
             if (login.Username == "Jignesh")
             {
-                user = new User { Username = "Jignesh Trivedi", EmailAddress = "test.btest@gmail.com" };
+                user = new User { Username = "Jignesh Trivedi", EmailAddress = "test.btest@gmail.com", DateOfJoing = DateTime.Now };
             }
             return user;
+        }
+
+        public string Authenticate(string username, string password)
+        {
+            var user = _users.SingleOrDefault(x => x.Username == username && x.Password == password);
+
+            // return null if user not found
+            if (user == null)
+                return null;
+
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_config["JwtConfig:secret"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                     new Claim(ClaimTypes.Name, user.Id.ToString()),
+                }),
+                IssuedAt = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = "Issuer",
+                Audience = "Audience"
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public IActionResult AuthenticateMvc(LoginRequest request, string redirectUrl = "")
+        {
+            var response = new Response<LoginResponse>()
+            {
+                StatusCode = Status.Failed,
+                Result = new LoginResponse
+                {
+                    IsAuthenticate = false
+                }
+            };
+            var user = _users.SingleOrDefault(x => x.Username == request.UserName && x.Password == request.Password);
+
+            // return null if user not found
+            if (user == null)
+                return Json(response);
+
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_config["JWT:key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                     new Claim(ClaimTypes.Name, user.Id.ToString()),
+                }),
+                IssuedAt = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = "Issuer",
+                Audience = "Audience"
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            //Mock response
+            response = new Response<LoginResponse>()
+            {
+                StatusCode = Status.Success,
+                ResponseText = "Success",
+                Result = new LoginResponse
+                {
+                    IsAuthenticate = true,
+                    Token = tokenHandler.WriteToken(token),
+                    Role = "User",
+                    RedirectUrl = redirectUrl,
+                    Claims = new List<ClaimDto>()
+                    {
+                        new ClaimDto() {Type = ClaimTypes.Role, Value = "UserRole" },
+                        new ClaimDto() {Type= ClaimTypes.Email, Value = "email@email.com" }
+                    }
+                }
+            };
+            // var finalresponse = Ok(new { data = response });
+            return Json(response);
         }
     }
 }

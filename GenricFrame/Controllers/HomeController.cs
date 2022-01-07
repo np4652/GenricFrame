@@ -1,4 +1,5 @@
-﻿using GenricFrame.AppCode.Migrations;
+﻿using GenricFrame.AppCode.CustomAttributes;
+using GenricFrame.AppCode.Migrations;
 using GenricFrame.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,6 @@ namespace GenricFrame.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IServiceProvider IServiceProvider;
-
         public HomeController(ILogger<HomeController> logger, IServiceProvider ServiceProvider)
         {
             _logger = logger;
@@ -39,26 +39,30 @@ namespace GenricFrame.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
+        //[CustomeAuthorize]
         [Authorize]
         public ActionResult<IEnumerable<string>> Get()
         {
-            var currentUser = HttpContext.User;
-            int spendingTimeWithCompany = 0;
+            var userIdentity = HttpContext.User.Identity;
+            var currentUser = ((System.Security.Claims.ClaimsIdentity)HttpContext.User.Identity).Actor;
+            //int spendingTimeWithCompany = 0;
 
-            if (currentUser.HasClaim(c => c.Type == "DateOfJoing"))
-            {
-                DateTime date = DateTime.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "DateOfJoing").Value);
-                spendingTimeWithCompany = DateTime.Today.Year - date.Year;
-            }
+            //if (currentUser.HasClaim(c => c.Type == "DateOfJoing"))
+            //{
+            //    DateTime date = DateTime.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "DateOfJoing").Value);
+            //    spendingTimeWithCompany = DateTime.Today.Year - date.Year;
+            //}
 
-            if (spendingTimeWithCompany > 5)
-            {
-                return new string[] { "High Time1", "High Time2", "High Time3", "High Time4", "High Time5" };
-            }
-            else
-            {
-                return new string[] { "value1", "value2", "value3", "value4", "value5" };
-            }
+            //if (spendingTimeWithCompany > 5)
+            //{
+            //    return new string[] { "High Time1", "High Time2", "High Time3", "High Time4", "High Time5" };
+            //}
+            //else
+            //{
+            //    return new string[] { "value1", "value2", "value3", "value4", "value5" };
+            //}
+            return new string[] { "value1", "value2", "value3", "value4", "value5" };
         }
 
         [HttpPost,Route(nameof(RunMigration))]
