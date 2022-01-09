@@ -1,7 +1,9 @@
 ﻿using GenricFrame.AppCode.CustomAttributes;
+using GenricFrame.AppCode.Interfaces;
 using GenricFrame.AppCode.Migrations;
 using GenricFrame.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,12 +16,18 @@ namespace GenricFrame.Controllers
 {
     public class HomeController : Controller
     {
+        private IUserService _userService;
+        private IHttpContextAccessor _httpContext;
         private readonly ILogger<HomeController> _logger;
         private readonly IServiceProvider IServiceProvider;
-        public HomeController(ILogger<HomeController> logger, IServiceProvider ServiceProvider)
+        private readonly User _user;
+        public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContext, IUserService userService, IServiceProvider ServiceProvider)
         {
+            _userService = userService;
+            _httpContext = httpContext;
             _logger = logger;
             IServiceProvider = ServiceProvider;
+            _user = (Models.User)_httpContext.HttpContext.Items["User"];
         }
 
         public IActionResult Index()
@@ -39,33 +47,13 @@ namespace GenricFrame.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        //[CustomeAuthorize]
-        [Authorize]
-        public ActionResult<IEnumerable<string>> Get()
+        [JWTAuthorize]
+        public ActionResult Get()
         {
-            var userIdentity = HttpContext.User.Identity;
-            var currentUser = ((System.Security.Claims.ClaimsIdentity)HttpContext.User.Identity).Actor;
-            //int spendingTimeWithCompany = 0;
-
-            //if (currentUser.HasClaim(c => c.Type == "DateOfJoing"))
-            //{
-            //    DateTime date = DateTime.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "DateOfJoing").Value);
-            //    spendingTimeWithCompany = DateTime.Today.Year - date.Year;
-            //}
-
-            //if (spendingTimeWithCompany > 5)
-            //{
-            //    return new string[] { "High Time1", "High Time2", "High Time3", "High Time4", "High Time5" };
-            //}
-            //else
-            //{
-            //    return new string[] { "value1", "value2", "value3", "value4", "value5" };
-            //}
-            return new string[] { "value1", "value2", "value3", "value4", "value5" };
+            return Json(_user);
         }
 
-        [HttpPost,Route(nameof(RunMigration))]
+        [HttpPost, Route(nameof(RunMigration))]
         public IActionResult RunMigration(string DatabaseName)
         {
             var result = MigrationManager.MigrateDatabase(IServiceProvider, DatabaseName);

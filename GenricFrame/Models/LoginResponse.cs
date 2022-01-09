@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GenricFrame.Models
 {
-    public class LoginResponse
+    public class LoginResponse : Response<User>
     {
-        public bool IsAuthenticate { get; set; }
+        public bool IsAuthenticate { get; set; }        
+        public Guid Guid { get; set; }
         public string Token { get; set; }
-        public string Role { get; set; }
         public string RedirectUrl { get; set; }
-        public List<ClaimDto> Claims { get; set; }
+        //public List<ClaimDto> Claims { get; set; }
     }
 
     public class ClaimDto

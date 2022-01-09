@@ -1,9 +1,14 @@
 using FluentMigrator.Runner;
 using GenricFrame.AppCode.DAL;
+using GenricFrame.AppCode.Interfaces;
+using GenricFrame.AppCode.Middleware;
 using GenricFrame.AppCode.Migrations;
+using GenricFrame.AppCode.Reops;
+using GenricFrame.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,7 +48,7 @@ namespace GenricFrame
                .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false;
-                    options.SaveToken = true;
+                    options.SaveToken = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -57,6 +62,11 @@ namespace GenricFrame
                 });
             /* End Jwd */
             services.AddControllersWithViews();
+            // configure strongly typed settings object
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -77,11 +87,16 @@ namespace GenricFrame
             }
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors("AllowAll");
-            app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+            //app.UseAuthentication();
+            //app.UseAuthorization();
 
-
+            
+            // custom jwt auth middleware
+            app.UseMiddleware<JwtMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
