@@ -57,11 +57,11 @@ namespace GenricFrame.AppCode.Middleware
                     ResponseText=nameof(Status.Success),
                     IsAuthenticate = true,
                     Token = token,
-                    Result = new User
+                    Result = new AppicationUser
                     {
                         Id = int.Parse(claims.First(x => x.Type == "id").Value),
                         Role = Convert.ToString(claims.First(x => x.Type == "role").Value),
-                        Username = Convert.ToString(claims.First(x => x.Type == "userName").Value)
+                        UserName = Convert.ToString(claims.First(x => x.Type == "userName").Value)
                     }
                 };                
                 context.Items["User"] = loginResponse;

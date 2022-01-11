@@ -1,5 +1,6 @@
 using FluentMigrator.Runner;
 using GenricFrame.AppCode.DAL;
+using GenricFrame.AppCode.Data;
 using GenricFrame.AppCode.Interfaces;
 using GenricFrame.AppCode.Middleware;
 using GenricFrame.AppCode.Migrations;
@@ -9,10 +10,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Reflection;
 using System.Text;
 
@@ -62,6 +65,29 @@ namespace GenricFrame
                 });
             /* End Jwd */
             services.AddControllersWithViews();
+            #region Identity
+            services.AddScoped<ApplicationDbContext>();
+            services.AddIdentity<AppicationUser, ApplicationRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+            });
+            services.AddTransient<IUserStore<AppicationUser>, UserStore>();
+            services.AddTransient<IRoleStore<ApplicationRole>, RoleStore>();
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
+            #endregion
             // configure strongly typed settings object
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             // configure DI for application services
@@ -91,10 +117,11 @@ namespace GenricFrame
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-            //app.UseAuthentication();
-            //app.UseAuthorization();
-
             
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
             // custom jwt auth middleware
             app.UseMiddleware<JwtMiddleware>();
             app.UseEndpoints(endpoints =>

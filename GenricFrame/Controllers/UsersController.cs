@@ -13,13 +13,13 @@ namespace GenricFrame.Controllers
     {
         private IUserService _userService;
         private IHttpContextAccessor _httpContext;
-        private User _user;
+        private AppicationUser _user;
 
         public UsersController(IHttpContextAccessor httpContext, IUserService userService)
         {
             _userService = userService;
             _httpContext = httpContext;
-            _user = (Models.User)_httpContext.HttpContext.Items["User"];
+            _user = (Models.AppicationUser)_httpContext.HttpContext.Items["User"];
         }
 
         //[HttpPost("authenticate")]

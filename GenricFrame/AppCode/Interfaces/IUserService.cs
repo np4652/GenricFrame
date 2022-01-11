@@ -6,7 +6,7 @@ namespace GenricFrame.AppCode.Interfaces
     public interface IUserService
     {
         AuthenticateResponse Authenticate(LoginRequest model);
-        IEnumerable<User> GetAll();
-        User GetById(int id);
+        IEnumerable<AppicationUser> GetAll();
+        AppicationUser GetById(int id);
     }
 }

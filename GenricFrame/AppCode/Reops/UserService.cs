@@ -14,9 +14,9 @@ namespace GenricFrame.AppCode.Reops
     public class UserService:IUserService
     {
          // users hardcoded for simplicity, store in a db with hashed passwords in production applications
-        private List<User> _users = new List<User>
+        private List<AppicationUser> _users = new List<AppicationUser>
         {
-            new User { Id = 1, Username = "test", Password = "test" }
+            new AppicationUser { Id = 1, UserName = "test", Password = "test" }
         };
 
         private readonly AppSettings _appSettings;
@@ -28,7 +28,7 @@ namespace GenricFrame.AppCode.Reops
 
         public AuthenticateResponse Authenticate(LoginRequest model)
         {
-            var user = _users.SingleOrDefault(x => x.Username == model.UserName && x.Password == model.Password);
+            var user = _users.SingleOrDefault(x => x.UserName == model.UserName && x.Password == model.Password);
 
             // return null if user not found
             if (user == null) return null;
@@ -39,19 +39,19 @@ namespace GenricFrame.AppCode.Reops
             return new AuthenticateResponse(user, token);
         }
 
-        public IEnumerable<User> GetAll()
+        public IEnumerable<AppicationUser> GetAll()
         {
             return _users;
         }
 
-        public User GetById(int id)
+        public AppicationUser GetById(int id)
         {
             return _users.FirstOrDefault(x => x.Id == id);
         }
 
         // helper methods
 
-        private string generateJwtToken(User user)
+        private string generateJwtToken(AppicationUser user)
         {
             // generate token that is valid for 7 days
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -60,7 +60,7 @@ namespace GenricFrame.AppCode.Reops
             var claims = new[] {
                 new Claim("id", user.Id.ToString()),
                 new Claim("role", "Admin"),
-                new Claim("userName", user.Username),
+                new Claim("userName", user.UserName),
                // new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
                // new Claim(JwtRegisteredClaimNames.Email, userInfo.EmailAddress),
                // new Claim("DateOfJoing", userInfo.DateOfJoing.ToString("yyyy-MM-dd")),

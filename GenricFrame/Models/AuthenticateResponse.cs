@@ -7,10 +7,10 @@
         public string Token { get; set; }
 
 
-        public AuthenticateResponse(User user, string token)
+        public AuthenticateResponse(AppicationUser user, string token)
         {
             Id = user.Id;
-            Username = user.Username;
+            Username = user.UserName;
             Token = token;
         }
     }
