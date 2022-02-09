@@ -16,7 +16,7 @@ namespace GenricFrame.AppCode.Reops
          // users hardcoded for simplicity, store in a db with hashed passwords in production applications
         private List<AppicationUser> _users = new List<AppicationUser>
         {
-            new AppicationUser { Id = 1, UserName = "test", Password = "test" }
+            new AppicationUser { Id = 1, UserName = "test", PasswordHash = "test" }
         };
 
         private readonly AppSettings _appSettings;
@@ -28,7 +28,7 @@ namespace GenricFrame.AppCode.Reops
 
         public AuthenticateResponse Authenticate(LoginRequest model)
         {
-            var user = _users.SingleOrDefault(x => x.UserName == model.UserName && x.Password == model.Password);
+            var user = _users.SingleOrDefault(x => x.UserName == model.UserName && x.PasswordHash == model.Password);
 
             // return null if user not found
             if (user == null) return null;

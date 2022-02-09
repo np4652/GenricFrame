@@ -33,8 +33,8 @@ namespace GenricFrame.Controllers
         }
         private List<AppicationUser> _users = new List<AppicationUser>
          {
-             new AppicationUser { Id = 1, UserName = "Amit", Password = "password" },
-             new AppicationUser { Id = 2, UserName = "test", Password = "test" }
+             new AppicationUser { Id = 1, UserName = "Amit", PasswordHash = "password" },
+             new AppicationUser { Id = 2, UserName = "test", PasswordHash = "test" }
          };
 
         [HttpGet]
@@ -48,7 +48,7 @@ namespace GenricFrame.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var user = new AppicationUser { UserName = model.EmailId, Email = model.EmailId };
+            var user = new AppicationUser {UserId= Guid.NewGuid().ToString(), UserName = model.EmailId, Email = model.EmailId, Role = model.RoleName };
             var res = await _userManager.CreateAsync(user, model.Password);
             if (res.Succeeded)
             {
@@ -70,6 +70,8 @@ namespace GenricFrame.Controllers
         {
             return View();
         }
+
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
@@ -106,7 +108,7 @@ namespace GenricFrame.Controllers
         /* JWT */
         #region JWT
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]LoginRequest model)
+        public IActionResult Authenticate([FromBody] LoginRequest model)
         {
             var response = Authenticate(model.UserName, model.Password);
             if (response == null)
@@ -114,9 +116,9 @@ namespace GenricFrame.Controllers
             return Ok(response);
         }
         // helper methods
-        private AuthenticateResponse Authenticate(string userName,string password)
+        private AuthenticateResponse Authenticate(string userName, string password)
         {
-            var user = _users.SingleOrDefault(x => x.UserName == userName && x.Password == password);
+            var user = _users.SingleOrDefault(x => x.UserName == userName && x.PasswordHash == password);
 
             // return null if user not found
             if (user == null) return null;

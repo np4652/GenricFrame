@@ -11,7 +11,8 @@ using System.Diagnostics;
 
 namespace GenricFrame.Controllers
 {
-    [Authorize]
+    //[Authorize]
+    [JWTAuthorize]
     public class HomeController : Controller
     {
         private IUserService _userService;

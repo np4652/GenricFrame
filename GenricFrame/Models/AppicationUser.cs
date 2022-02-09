@@ -9,12 +9,12 @@ namespace GenricFrame.Models
 {
     public class AppicationUser:IdentityUser<int>
     {
-        //public int Id { get; set; }
+        public string UserId { get; set; }
         //public string UserName { get; set; }
         public string Role { get; set; }
-        [JsonIgnore]
-        public string Password { get; set; }
-        public string EmailAddress { get; set; }
-        public DateTime DateOfJoing { get; set; }
+        //[JsonIgnore]
+        //public string Password { get; set; }
+        //public string EmailAddress { get; set; }
+        //public DateTime DateOfJoing { get; set; }
     }
 }
