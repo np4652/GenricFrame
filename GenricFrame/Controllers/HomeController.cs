@@ -1,4 +1,5 @@
 ﻿using GenricFrame.AppCode.CustomAttributes;
+using GenricFrame.AppCode.Extensions;
 using GenricFrame.AppCode.Interfaces;
 using GenricFrame.AppCode.Migrations;
 using GenricFrame.Models;
@@ -12,7 +13,7 @@ using System.Diagnostics;
 namespace GenricFrame.Controllers
 {
     //[Authorize]
-    [JWTAuthorize]
+    //[JWTAuthorize]
     public class HomeController : Controller
     {
         private IUserService _userService;
@@ -31,9 +32,17 @@ namespace GenricFrame.Controllers
 
         public IActionResult Index()
         {
+            var userId = User.GetLoggedInUserId<string>(); // Specify the type of your UserId;
+            var userName = User.GetLoggedInUserName();
+            var userEmail = User.GetLoggedInUserEmail();
             return View();
         }
 
+        [ValidateAjax]
+        public IActionResult DemoModalValidation(DemoViewModel demo)
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

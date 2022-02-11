@@ -1,31 +1,81 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Student";
 }
+@model GenricFrame.Models.DemoViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-<div class="row">
-    <div class="col-sm-4"></div>
-    <div class="col-sm-4">
-        <div class="form-group">
-            <span class="h4">Database Name</span>
-        </div>
-        <div class="form-group">
-            <input type="text" class="form-control" value="" placeholder="Database Name" name="databaseName" />
-        </div>
-        <div class="form-group">
-            <button class="btn btn-outline-dark" id="runMigration">Run Migration</button>
-        </div>
+<form id="StudentForm">
+    <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" class="form-control" asp-for="FirstName">
+        <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
-    <div class="col-sm-4"></div>
-</div>
-@section Scripts{ 
+    <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" class="form-control" asp-for="LastName">
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="text" class="form-control" asp-for="EmailAddress">
+        <span asp-validation-for="EmailAddress" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="date" class="form-control" asp-for="DateOfBirth">
+        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+    </div>
+    <button type="button" class="btn btn-primary submit">Submit</button>
+</form>
+@section Scripts{
     <script>
-        $('#runMigration').click(e => {
-            let databaseName = $('[name="databaseName"]').val();
-            $.post('/RunMigration', { DatabaseName: databaseName }).done(result => { }).always(() => { });
-        })
+        $('.submit').on('click', () => {
+            $('span').text('');
+            $.ajax(
+                {
+                    url: '/Home/DemoModalValidation',
+                    data: $('#StudentForm').serialize(),
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (xhr) {
+                        Q.validationError(xhr);
+                        //let validationErrors = xhr.responseJSON;
+                        //for (var i = 0; i < validationErrors.length; i++) {
+                        //    $('span[data-valmsg-for="' + validationErrors[i].key + '"]').text(validationErrors[i].errors[0]);
+                        //}
+                    }
+                });
+        });
     </script>
 }
+    @*@{
+            ViewData["Title"] = "Home Page";
+        }
+
+        <div class="text-center">
+            <h1 class="display-4">Welcome</h1>
+            <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <span class="h4">Database Name</span>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" value="" placeholder="Database Name" name="databaseName" />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-outline-dark" id="runMigration">Run Migration</button>
+                </div>
+            </div>
+            <div class="col-sm-4"></div>
+        </div>
+        @section Scripts{
+            <script>
+                $('#runMigration').click(e => {
+                    let databaseName = $('[name="databaseName"]').val();
+                    $.post('/RunMigration', { DatabaseName: databaseName }).done(result => { }).always(() => { });
+                })
+            </script>
+        }*@

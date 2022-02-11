@@ -48,7 +48,7 @@ namespace GenricFrame.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var user = new AppicationUser {UserId= Guid.NewGuid().ToString(), UserName = model.EmailId, Email = model.EmailId, Role = model.RoleName };
+            var user = new AppicationUser { UserId = Guid.NewGuid().ToString(), UserName = model.EmailId, Email = model.EmailId, Role = model.RoleName };
             var res = await _userManager.CreateAsync(user, model.Password);
             if (res.Succeeded)
             {
@@ -73,13 +73,22 @@ namespace GenricFrame.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null, bool IsAPIRequest = false)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
             var result = await _signInManager.PasswordSignInAsync(model.EmailId, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
-                return LocalRedirect(returnUrl);
+                if(!IsAPIRequest)
+                    return LocalRedirect(returnUrl);
+
+                var user = _userManager.FindByEmailAsync(model.EmailId).Result;
+                //if (user == null) return null;
+
+                // authentication successful so generate jwt token
+                var token = generateJwtToken(user);
+                return Json(new AuthenticateResponse(user, token));
+                
             }
             else
             {
