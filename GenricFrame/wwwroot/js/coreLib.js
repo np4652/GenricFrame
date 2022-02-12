@@ -746,7 +746,16 @@ function printDiv(divName) {
             URL.revokeObjectURL(output.src) // free memory
         }
     };
+
+    Q.validationError = xhr => {
+        let validationErrors = xhr.responseJSON;
+        for (var i = 0; i < validationErrors.length; i++) {
+            $('span[data-valmsg-for="' + validationErrors[i].key + '"]').text(validationErrors[i].errors[0]);
+        }
+    }
 })(Q || (Q = {}));
+
+
 
 (function ($) {
     $.fn.fixTableHeader = function () {
