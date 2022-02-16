@@ -1,4 +1,5 @@
-﻿const ajaxValidationError = xhr => {
+﻿var Q;
+const ajaxValidationError = xhr => {
     let validationErrors = xhr.responseJSON;
     for (var i = 0; i < validationErrors.length; i++) {
         $('span[validation-error-for="' + validationErrors[i].key + '"]').text(validationErrors[i].errors[0]);
@@ -740,7 +741,7 @@ function printDiv(divName) {
         }
     };
 
-    Q.previewImage = (event, output = 'profile') {
+    Q.previewImage = (event, output = 'profile') => {
         output.src = URL.createObjectURL(event.target.files[0]);
         output.onload = function () {
             URL.revokeObjectURL(output.src) // free memory
