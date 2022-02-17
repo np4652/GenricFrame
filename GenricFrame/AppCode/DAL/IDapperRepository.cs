@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GenricFrame.AppCode.DAL
 {
-    interface IDapperRepository 
+    public interface IDapperRepository 
     {
         DbConnection GetDbconnection();
         IDbConnection GetMasterConnection();

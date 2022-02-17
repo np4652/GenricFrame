@@ -1,6 +1,7 @@
 using FluentMigrator.Runner;
 using GenricFrame.AppCode.DAL;
 using GenricFrame.AppCode.Data;
+using GenricFrame.AppCode.Data.Repository;
 using GenricFrame.AppCode.Interfaces;
 using GenricFrame.AppCode.Middleware;
 using GenricFrame.AppCode.Migrations;
@@ -16,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Reflection;
 using System.Text;
 
@@ -33,7 +36,12 @@ namespace GenricFrame
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<DapperRepository>();
+            //services.AddSingleton<DapperRepository>();
+            // Read the connection string from appsettings.
+            string dbConnectionString = this.Configuration.GetConnectionString("SqlConnection");
+            services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
+            services.AddSingleton<IDapperRepository, DapperRepository>((sp) => new DapperRepository(Configuration, dbConnectionString));
+            services.AddSingleton<IDemo, DemoRepo>();
             services.AddSingleton<Database>();
             services.AddLogging(c => c.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
@@ -98,7 +106,6 @@ namespace GenricFrame
                 options.AddPolicy("AllowAll",
                     builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
             });
-
             //services.AddHttpContextAccessor();
         }
 
@@ -119,7 +126,7 @@ namespace GenricFrame
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-            
+
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -748,10 +748,12 @@ function printDiv(divName) {
         }
     };
 
-    Q.validationError = xhr => {
-        let validationErrors = xhr.responseJSON;
-        for (var i = 0; i < validationErrors.length; i++) {
-            $('span[data-valmsg-for="' + validationErrors[i].key + '"]').text(validationErrors[i].errors[0]);
+    Q.renderError = xhr => {
+        if (xhr.status === 400) {
+            let validationErrors = xhr.responseJSON;
+            for (var i = 0; i < validationErrors.length; i++) {
+                $('span[data-valmsg-for="' + validationErrors[i].key + '"]').text(validationErrors[i].errors[0]);
+            }
         }
     }
 })(Q || (Q = {}));

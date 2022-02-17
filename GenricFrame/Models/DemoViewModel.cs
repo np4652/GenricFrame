@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GenricFrame.Models
@@ -17,5 +18,6 @@ namespace GenricFrame.Models
 
         [Required(ErrorMessage = "Date of Birth Name can't be empty.")]
         public DateTime? DateOfBirth { get; set; }
+        public IEnumerable<AppicationUser> AppicationUser { get; set; }
     }
 }
