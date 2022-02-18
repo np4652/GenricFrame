@@ -1,11 +1,10 @@
 using FluentMigrator.Runner;
 using GenricFrame.AppCode.DAL;
 using GenricFrame.AppCode.Data;
-using GenricFrame.AppCode.Data.Repository;
+using GenricFrame.AppCode.Reops;
 using GenricFrame.AppCode.Interfaces;
 using GenricFrame.AppCode.Middleware;
 using GenricFrame.AppCode.Migrations;
-using GenricFrame.AppCode.Reops;
 using GenricFrame.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -41,7 +40,7 @@ namespace GenricFrame
             string dbConnectionString = this.Configuration.GetConnectionString("SqlConnection");
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
             services.AddSingleton<IDapperRepository, DapperRepository>((sp) => new DapperRepository(Configuration, dbConnectionString));
-            services.AddSingleton<IDemo, DemoRepo>();
+            services.AddSingleton<IRepository<DemoViewModel>, DemoRepo>();
             services.AddSingleton<Database>();
             services.AddLogging(c => c.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()

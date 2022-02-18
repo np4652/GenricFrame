@@ -1,5 +1,5 @@
 ﻿using GenricFrame.AppCode.CustomAttributes;
-using GenricFrame.AppCode.Data.Repository;
+using GenricFrame.AppCode.Reops;
 using GenricFrame.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
