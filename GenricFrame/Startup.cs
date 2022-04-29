@@ -42,6 +42,7 @@ namespace GenricFrame
             services.AddSingleton<IDapperRepository, DapperRepository>((sp) => new DapperRepository(Configuration, dbConnectionString));
             services.AddSingleton<IRepository<DemoViewModel>, DemoRepo>();
             services.AddSingleton<Database>();
+            services.AddAutoMapper(typeof(Startup));
             services.AddLogging(c => c.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .ConfigureRunner(c => c.AddSqlServer2016()
